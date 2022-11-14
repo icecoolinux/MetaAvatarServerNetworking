@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  avatarserver_compile:
+    build:
+      context: ./
+      dockerfile: Dockerfile_compile
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/server
+  avatarserver:
+    build: ./
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/server
+

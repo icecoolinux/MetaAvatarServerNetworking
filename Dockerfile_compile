@@ -1,0 +1,10 @@
+FROM debian:11
+
+USER root
+
+WORKDIR /server
+
+RUN apt update
+RUN apt -y install make g++
+
+CMD [ "make" ]

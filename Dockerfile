@@ -1,5 +1,7 @@
-FROM node:17
+FROM debian:11
+
+USER root
 
 WORKDIR /server
 
-CMD [ "node", "index.js" ]
+CMD [ "./avatarServer", "8888" ]
