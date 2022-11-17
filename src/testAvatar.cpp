@@ -80,10 +80,11 @@ int main(int argc, char** argv)
 					unsigned char* buf2 = p2->getData();
 					buf2[0] = PACKET_DATA;
 					buf2[1] = PACKET_DATA_AVATAR;
-					strcpy(&(buf[2]), "UserAvatar;");
+					strcpy((char*)&(buf2[2]), "UserAvatar;");
 
 					// Copy the avatar info.
 					int pos2 = 13;
+
 					while(pos < p->getLen())
 					{
 						buf2[pos2] = buf[pos];
