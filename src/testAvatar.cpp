@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 				if(buf[1] == PACKET_DATA_AVATAR)
 				{
 					// Find the info data avater, after the ';' character.
-					int pos = 2;
+					int pos = 30;
 					while(buf[pos] != ';')
 						pos++;
 					pos++;
@@ -77,13 +77,16 @@ int main(int argc, char** argv)
 					// Send the avatar as me
 					Packet* p2 = Packet::getPacket();
 
+					// Copy the header, position and rotation.
 					unsigned char* buf2 = p2->getData();
-					buf2[0] = PACKET_DATA;
-					buf2[1] = PACKET_DATA_AVATAR;
-					strcpy((char*)&(buf2[2]), "UserAvatar;");
+					for(int i=0; i<30; i++)
+						buf2[i] = buf[i];
+
+					// Put my name
+					strcpy((char*)&(buf2[30]), "UserAvatar;");
 
 					// Copy the avatar info.
-					int pos2 = 13;
+					int pos2 = 30 + 11;
 
 					while(pos < p->getLen())
 					{
