@@ -65,9 +65,7 @@ void Users::process()
 		// If it's in a room leave first.
 		if(user->getRoom() != NULL)
 			HandleRoom::getInstance()->userLeave(user);
-char name[200];
-user->getName(name);
-printf("Eliminado %s\n", name);
+
 		users.remove(user);
 		deadUsers.pop_front();
 		delete user;

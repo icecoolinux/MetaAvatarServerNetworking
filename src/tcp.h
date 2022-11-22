@@ -2,6 +2,7 @@
 #define _tcp_udp_h_
 
 #include <stdio.h>
+#include <errno.h>
 
 #include "config.h"
 

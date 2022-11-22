@@ -24,7 +24,7 @@ class Time
 
 		int stop();
 
-		static unsigned long int currentSeconds();
+		static time_t currentSeconds();
 		static unsigned long long currentMs();
 
 		static void sleep(int ms, int seconds);

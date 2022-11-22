@@ -6,6 +6,8 @@ User::User(int sock)
 {
 	tcp = TCP::getInstance();
 
+	this->idThread = -1;
+	
 	this->mustExit = false;
 	this->exited = false;
 
@@ -62,9 +64,8 @@ bool User::isExited()
 
 void User::run()
 {
-	pthread_t idHilo;
-	pthread_create(&idHilo, NULL, &(User::run_thread), this);
-	pthread_detach(idHilo);
+	pthread_create(&idThread, NULL, &(User::run_thread), this);
+	pthread_detach(idThread);
 }
 
 void* User::run_thread(void* user_)

@@ -56,12 +56,9 @@ int Time::stop()
 }
 
 //Retorna los segundos actuales.
-unsigned long int Time::currentSeconds()
+time_t Time::currentSeconds()
 {
-	struct timeval t1;
-	struct timezone tz;
-	gettimeofday(&t1, &tz);
-	return t1.tv_sec;
+	return time(NULL);
 }
 
 unsigned long long Time::currentMs()

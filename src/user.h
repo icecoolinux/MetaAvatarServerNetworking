@@ -16,6 +16,8 @@ using namespace std;
 class User
 {
 	private:
+		pthread_t idThread;
+	
 		int sock;
 		char username[MAX_USERNAME+1];
 		Room* room;

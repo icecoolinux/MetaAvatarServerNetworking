@@ -180,9 +180,21 @@ int TCP::receive(int sock, Packet* &p)
 		else if( bytes_read == 0)
 			return -1;
 
-		// I didnt read anything, I exit
+		// I read an error
 		else
-			return 0;
+		{
+			// Common error, non-blocking.
+			if(errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				// There's no packet yet.
+				return 0;
+			}
+			// Fatal error.
+			else
+			{
+				return -1;
+			}
+		}
 	}
 
 	// I already have the bytes that define the packet len.
@@ -246,9 +258,21 @@ int TCP::receive(int sock, Packet* &p)
 			return -1;
 		}
 
-		// It didnt read anything, I return
+		// I read an error
 		else
-			return 0;
+		{
+			// Common error, non-blocking.
+			if(errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				// There's no packet yet.
+				return 0;
+			}
+			// Fatal error.
+			else
+			{
+				return -1;
+			}
+		}
 	}
 
 	return 0;
@@ -284,8 +308,24 @@ printf("send %d\n", len);
 			// Grow the amount of bytes written
 			pos += b_sent;
 		}
+		// Not bytes written (sure the buffer is full)
+		else if(b_sent == 0)
+		{
+		}
+		// Error
 		else
 		{
+			if(errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				// Common error, non-blocking.
+			}
+			// Fatal error.
+			else
+			{
+				return false;
+			}
+			
+			/*
 			// Check if the socket is closed.
 			if (b_sent == 0)
 			{
@@ -303,7 +343,14 @@ printf("send %d\n", len);
 
 				 Time::sleep(WAITING_BLOCK_MS, 0);
 			}
+			*/
 		}
+		
+		// If wants to exit then return false.
+		if( exit != NULL && *exit )
+			return false;
+			
+		Time::sleep(WAITING_BLOCK_MS, 0);
 	}
 
 	pos = 0;
@@ -320,6 +367,24 @@ printf("send %d\n", len);
 			// Grow the amount of bytes written
 			pos += b_sent;
 		}
+		// Not bytes written (sure the buffer is full)
+		else if(b_sent == 0)
+		{
+		}
+		// Error
+		else
+		{
+			if(errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				// Common error, non-blocking.
+			}
+			// Fatal error.
+			else
+			{
+				return false;
+			}
+			
+			/*
 		else
 		{
 			// Check if the socket is closed.
@@ -340,6 +405,14 @@ printf("send %d\n", len);
 			   Time::sleep(WAITING_BLOCK_MS, 0);
 			}
 		}
+		*/
+		}
+		
+		// If wants to exit then return false.
+		if( exit != NULL && *exit )
+			return false;
+		
+		Time::sleep(WAITING_BLOCK_MS, 0);
 	}
 
 	// Return there is connection.
