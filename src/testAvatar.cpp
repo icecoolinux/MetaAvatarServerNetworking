@@ -48,8 +48,8 @@ int main(int argc, char** argv)
 
 	// User enter room 1
 	buf[0] = ENTER_ROOM;
-	strcpy(&(buf[1]), "ShoppingVR;1");
-	p->setLen(1 + strlen("ShoppingVR;1")+1);
+	strcpy(&(buf[1]), "ShoppingVR;2");
+	p->setLen(1 + strlen("ShoppingVR;2")+1);
 	tcp->sendPacket(sock, p, NULL);
 	Packet::releasePacket(p);
 
@@ -82,6 +82,12 @@ int main(int argc, char** argv)
 					for(int i=0; i<30; i++)
 						buf2[i] = buf[i];
 
+					// Change pos x.
+					float x;
+					memcpy(&x, &(buf2[2]), 4);
+					x += 1.0f;
+					memcpy(&(buf2[2]), &x, 4);
+
 					// Put my name
 					strcpy((char*)&(buf2[30]), "UserAvatar;");
 
@@ -101,6 +107,37 @@ int main(int argc, char** argv)
 
 					Packet::releasePacket(p2);
 				}
+                                // It's object position and rotation.
+                                else if(buf[1] == PACKET_DATA_OBJECT_POS_ROT)
+                                {
+                                        // Resend the packet
+                                        Packet* p2 = Packet::getPacket();
+
+					unsigned char* buf2 = p2->getData();
+
+                                        for(int i=0; i< p->getLen(); i++)
+	                                        buf2[i] = buf[i];
+
+	                                // Change pos x.
+                                        float x;
+                                        memcpy(&x, &(buf2[2]), 4);
+                                        x += 1.0f;
+                                        memcpy(&(buf2[2]), &x, 4);
+
+					// Change id object
+					int pos = 30;
+					while(buf2[pos] != '_')
+						pos++;
+					pos--;
+					buf2[pos] = (((buf2[pos]-48)+1)%10)+48;
+
+                                        p2->setLen(p->getLen());
+
+                                        tcp->sendPacket(sock, p2, &haveExit);
+
+                                        Packet::releasePacket(p2);
+                                }
+
 			}
 
 			Packet::releasePacket(p);
