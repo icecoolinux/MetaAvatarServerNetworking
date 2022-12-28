@@ -10,6 +10,7 @@ class User;
 #include "room.h"
 #include "tcp.h"
 #include "handleRoom.h"
+#include <cstdlib>
 
 using namespace std;
 
@@ -53,7 +54,7 @@ class User
 		bool isExited();
 
 		void sendPacket(Packet* p);
-		void newUser(char* name);
+		void newUser(char* name, unsigned long long remoteAvatarUserID);
 		void leaveUser(char* name);
 
 		void run();

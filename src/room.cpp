@@ -68,8 +68,8 @@ void Room::userEnter(User* user)
 
 		other->getName(usernameOther);
 
-		other->newUser(username);
-		user->newUser(usernameOther);
+		other->newUser(username, user->getAvatarUserID());
+		user->newUser(usernameOther, other->getAvatarUserID());
 
 		it++;
 	}

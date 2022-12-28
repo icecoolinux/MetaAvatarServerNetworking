@@ -191,10 +191,10 @@ printf("11 %s\n", username);
 	semToSend->V();
 }
 
-void User::newUser(char* name)
+void User::newUser(char* name, unsigned long long remoteAvatarUserID)
 {
 printf("22\n");
-printf("22 %s\n", username);
+printf("22 %s %llu\n", username, remoteAvatarUserID);
 	if(sock < 0)
 		return;
 
@@ -205,8 +205,8 @@ printf("22 %s\n", username);
 
 	int posBuf = 1;
 
-	// Put avatar id
-	posBuf += sprintf(&(buf[posBuf]), "%llu;", avatarUserID);
+	// Put remote avatar id
+	posBuf += sprintf(&(buf[posBuf]), "%llu;", remoteAvatarUserID);
 
 	// Put username
 	strcpy(&(buf[posBuf]), name);
