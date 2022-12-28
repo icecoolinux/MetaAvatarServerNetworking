@@ -294,5 +294,7 @@ unsigned long long User::getNumber(unsigned char* buf, int &posBuf, int LEN_BUF,
 	}
 	numberString[pos] = '\0';
 
+	posBuf++;
+
 	return strtoull(numberString, NULL, 10);
 }
