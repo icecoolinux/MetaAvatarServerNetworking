@@ -40,8 +40,8 @@ int main(int argc, char** argv)
 	Packet* p = Packet::getPacket();
 	char* buf = (char*) p->getData();
 	buf[0] = USERNAME;
-	strcpy(&(buf[1]), "UserAvatar2");
-	p->setLen(1 + strlen("UserAvatar2")+1);
+	strcpy(&(buf[1]), "222;UserAvatar2");
+	p->setLen(1 + strlen("222;UserAvatar2")+1);
 	tcp->sendPacket(sock, p, NULL);
 
 	Time::sleep(100,0);

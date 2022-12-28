@@ -40,8 +40,8 @@ int main(int argc, char** argv)
 	Packet* p = Packet::getPacket();
 	char* buf = (char*) p->getData();
 	buf[0] = USERNAME;
-	strcpy(&(buf[1]), "UserAvatar");
-	p->setLen(1 + strlen("UserAvatar")+1);
+	strcpy(&(buf[1]), "111;UserAvatar");
+	p->setLen(1 + strlen("111;UserAvatar")+1);
 	tcp->sendPacket(sock, p, NULL);
 
 	Time::sleep(100,0);
@@ -107,36 +107,36 @@ int main(int argc, char** argv)
 
 					Packet::releasePacket(p2);
 				}
-                                // It's object position and rotation.
-                                else if(buf[1] == PACKET_DATA_OBJECT_POS_ROT)
-                                {
-                                        // Resend the packet
-                                        Packet* p2 = Packet::getPacket();
+                // It's object position and rotation.
+                else if(buf[1] == PACKET_DATA_OBJECT_POS_ROT)
+                {
+                        // Resend the packet
+                        Packet* p2 = Packet::getPacket();
 
-					unsigned char* buf2 = p2->getData();
+	unsigned char* buf2 = p2->getData();
 
-                                        for(int i=0; i< p->getLen(); i++)
-	                                        buf2[i] = buf[i];
+                        for(int i=0; i< p->getLen(); i++)
+                            buf2[i] = buf[i];
 
-	                                // Change pos x.
-                                        float x;
-                                        memcpy(&x, &(buf2[2]), 4);
-                                        x += 1.0f;
-                                        memcpy(&(buf2[2]), &x, 4);
+                    // Change pos x.
+                        float x;
+                        memcpy(&x, &(buf2[2]), 4);
+                        x += 1.0f;
+                        memcpy(&(buf2[2]), &x, 4);
 
-					// Change id object
-					int pos = 30;
-					while(buf2[pos] != '_')
-						pos++;
-					pos--;
-					buf2[pos] = (((buf2[pos]-48)+1)%10)+48;
+	// Change id object
+	int pos = 30;
+	while(buf2[pos] != '_')
+		pos++;
+	pos--;
+	buf2[pos] = (((buf2[pos]-48)+1)%10)+48;
 
-                                        p2->setLen(p->getLen());
+                        p2->setLen(p->getLen());
 
-                                        tcp->sendPacket(sock, p2, &haveExit);
+                        tcp->sendPacket(sock, p2, &haveExit);
 
-                                        Packet::releasePacket(p2);
-                                }
+                        Packet::releasePacket(p2);
+                }
 
 			}
 

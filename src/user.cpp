@@ -7,7 +7,7 @@ User::User(int sock)
 	tcp = TCP::getInstance();
 
 	this->idThread = -1;
-	
+
 	this->mustExit = false;
 	this->exited = false;
 
@@ -35,6 +35,11 @@ User::~User()
 void User::getName(char* username)
 {
 	strcpy(username, this->username);
+}
+
+unsigned long long User::getAvatarUserID()
+{
+	return avatarUserID;
 }
 
 void User::setRoom(Room* room)
@@ -111,29 +116,13 @@ void* User::run_thread(void* user_)
 			// Get username
 			if(packetType == USERNAME)
 			{
-				// Copy the username in a security way.
-				int pos = 0;
 				int posBuf = 1;
-				while(pos < MAX_USERNAME && posBuf < len)
-				{
-					// Reach the end of the name.
-					if(buf[posBuf] == '\0')
-						break;
 
-					// Check if the name is correct.
-					if( !isalnum(buf[posBuf]) && buf[posBuf] != '@' && buf[posBuf] != '.')
-					{
-						pos = 0;
-						user->username[0] = '\0';
-						break;
-					}
+				// Copy the userid
+				user->avatarUserID = User::getNumber(buf, posBuf, len, ';');
 
-					user->username[pos] = buf[posBuf];
-
-					pos++;
-					posBuf++;
-				}
-				user->username[pos] = '\0';
+				// Copy the username in a security way.
+				User::getString(buf, posBuf, len, user->username, MAX_USERNAME, '\0');
 			}
 
 			// The user wants to enter a room.
@@ -141,57 +130,14 @@ void* User::run_thread(void* user_)
 			{
 				if(user->username[0] != '\0')
 				{
-					char appname[MAX_APP_NAME+1];
-					char idRoomString[MAX_LEN_NUMBER_ROOM+1];
-					int idRoom;
+					int posBuf = 1;
 
 					// First copy the appname in a security way
-					int pos = 0;
-					int posBuf = 1;
-					while(pos < MAX_APP_NAME && posBuf < len)
-					{
-						// Reach the end of the name.
-						if(buf[posBuf] == ';')
-							break;
+					char appname[MAX_APP_NAME+1];
+					User::getString(buf, posBuf, len, appname, MAX_APP_NAME, ';');
 
-						// Check if the name is correct.
-						if( !isalnum(buf[posBuf]) && buf[posBuf] != '@' && buf[posBuf] != '.' && buf[posBuf] != ' ')
-						{
-							pos = 0;
-							appname[0] = '\0';
-							break;
-						}
-
-						appname[pos] = buf[posBuf];
-
-						posBuf++;
-						pos++;
-					}
-					appname[pos] = '\0';
 					// Now get the room number
-					posBuf++;
-					pos=0;
-					while(pos < MAX_LEN_NUMBER_ROOM && posBuf < len)
-					{
-						// Reach the end of the name.
-						if(buf[posBuf] == '\0')
-							break;
-
-						// Check if the name is correct.
-						if( !isdigit(buf[posBuf]) )
-						{
-							pos = 0;
-							idRoomString[0] = '\0';
-							break;
-						}
-
-						idRoomString[pos] = buf[posBuf];
-
-						posBuf++;
-						pos++;
-					}
-					idRoomString[pos] = '\0';
-					idRoom = atoi(idRoomString);
+					int idRoom = User::getNumber(buf, posBuf, len, '\0');
 
 					HandleRoom::getInstance()->userEnter(user, appname, idRoom);
 				}
@@ -256,9 +202,16 @@ printf("22 %s\n", username);
 
 	char* buf = (char*)p->getData();
 	buf[0] = ENTER_ROOM;
-	strcpy(&(buf[1]), name);
 
-	p->setLen(1 + strlen(name)+1);
+	int posBuf = 1;
+
+	// Put avatar id
+	posBuf += sprintf(&(buf[posBuf]), "%llu;", avatarUserID);
+
+	// Put username
+	strcpy(&(buf[posBuf]), name);
+
+	p->setLen(posBuf + strlen(name) + 1);
 
 	semToSend->P();
 	tosend.push_back(p);
@@ -283,4 +236,63 @@ printf("33 %s\n", username);
 	semToSend->P();
 	tosend.push_back(p);
 	semToSend->V();
+}
+
+
+void User::getString(unsigned char* buf, int &posBuf, int LEN_BUF, char* dst, int MAX_DST, char end)
+{
+	int pos=0;
+
+	while(pos < MAX_DST && posBuf < LEN_BUF)
+	{
+		// Reach the end of the name.
+		if(buf[posBuf] == end)
+			break;
+
+		// Check if the string is correct.
+		if( !isalnum(buf[posBuf]) && buf[posBuf] != '@' && buf[posBuf] != '.' && buf[posBuf] != ' ')
+		{
+			pos = 0;
+			dst[0] = '\0';
+			break;
+		}
+
+		dst[pos] = buf[posBuf];
+
+		posBuf++;
+		pos++;
+	}
+	dst[pos] = '\0';
+
+	posBuf++;
+}
+
+unsigned long long User::getNumber(unsigned char* buf, int &posBuf, int LEN_BUF, char end)
+{
+	int pos=0;
+
+	char numberString[100+1];
+
+	while(pos < 100 && posBuf < LEN_BUF)
+	{
+		// Reach the end of the name.
+		if(buf[posBuf] == end)
+			break;
+
+		// Check if the name is correct.
+		if( !isdigit(buf[posBuf]) )
+		{
+			pos = 0;
+			numberString[0] = '\0';
+			break;
+		}
+
+		numberString[pos] = buf[posBuf];
+
+		posBuf++;
+		pos++;
+	}
+	numberString[pos] = '\0';
+
+	return strtoull(numberString, NULL, 10);
 }

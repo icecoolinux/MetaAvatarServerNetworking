@@ -17,10 +17,12 @@ class User
 {
 	private:
 		pthread_t idThread;
-	
+
 		int sock;
 		char username[MAX_USERNAME+1];
 		Room* room;
+
+		unsigned long long avatarUserID;
 
 		bool mustExit;
 		bool exited;
@@ -32,12 +34,16 @@ class User
 
 		static void* run_thread(void* user);
 
+		static void getString(unsigned char* buf, int &posBuf, int LEN_BUF, char* dst, int MAX_DST, char end);
+		static unsigned long long getNumber(unsigned char* buf, int &posBuf, int LEN_BUF, char end);
+
 	public:
 
 		User(int sock);
 		~User();
 
 		void getName(char* username);
+		unsigned long long getAvatarUserID();
 
 		void setRoom(Room* room);
 		void clearRoom();
